@@ -1,56 +1,85 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
-        <ion-title>Blank</ion-title>
+        <ion-title>CryptoCurrency</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
+    <ion-content>
+      <div class="button-container">
+        <ion-button @click="fetchCryptoData" color="primary">Refresh</ion-button>
       </div>
+      <ion-grid v-if="cryptocurrencies.length > 0" class="table-container">
+        <ion-row class="table-header">
+          <ion-col>Rank</ion-col>
+          <ion-col>Name</ion-col>
+          <ion-col>Symbol</ion-col>
+          <ion-col>Price (USD)</ion-col>
+        </ion-row>
+        <ion-row v-for="crypto in cryptocurrencies" :key="crypto.id" class="table-row">
+          <ion-col>{{ crypto.rank }}</ion-col>
+          <ion-col>{{ crypto.name }}</ion-col>
+          <ion-col>{{ crypto.symbol }}</ion-col>
+          <ion-col>{{ crypto.price_usd }}</ion-col>
+        </ion-row>
+      </ion-grid>
     </ion-content>
   </ion-page>
 </template>
 
-<script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+<script lang="ts">
+import { defineComponent } from 'vue';
+import axios from 'axios';
+
+export default defineComponent({
+  name: 'Home',
+  data() {
+    return {
+      cryptocurrencies: []
+    };
+  },
+  methods: {
+    async fetchCryptoData() {
+      try {
+        const response = await axios.get('https://api.coinlore.net/api/tickers/');
+        this.cryptocurrencies = response.data.data;
+      } catch (error) {
+        console.error('Error fetching cryptocurrency data:', error);
+      }
+    }
+  }
+});
 </script>
 
 <style scoped>
-#container {
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.table-container {
+  width: 100%;
+  margin-top: 20px;
+}
+
+.table-header {
+  font-weight: bold;
+  border-bottom: 2px solid #ccc;
+  padding: 10px 0;
+}
+
+.table-row {
+  border-bottom: 1px solid #eee;
+}
+
+ion-col {
+  padding: 10px;
   text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
+ion-row {
+  align-items: center;
 }
 </style>
